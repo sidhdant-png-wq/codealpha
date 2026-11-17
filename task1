@@ -1,0 +1,307 @@
+#include <iostream>
+#include <vector>
+#include <iomanip>
+#include <string>
+using namespace std;
+
+// Subject Class
+class Subject
+{
+public:
+    string subjectName;
+    int marks;
+    int credits;
+    float gradePoint;
+    string grade;
+
+    void inputSubject()
+    {
+        cout << "\nEnter Subject Name: ";
+        cin.ignore();
+        getline(cin, subjectName);
+
+        cout << "Enter Marks (0-100): ";
+        cin >> marks;
+
+        cout << "Enter Subject Credits: ";
+        cin >> credits;
+
+        calculateGrade();
+    }
+
+    void calculateGrade()
+    {
+        if (marks >= 90)
+        {
+            grade = "A+";
+            gradePoint = 10;
+        }
+        else if (marks >= 80)
+        {
+            grade = "A";
+            gradePoint = 9;
+        }
+        else if (marks >= 70)
+        {
+            grade = "B+";
+            gradePoint = 8;
+        }
+        else if (marks >= 60)
+        {
+            grade = "B";
+            gradePoint = 7;
+        }
+        else if (marks >= 50)
+        {
+            grade = "C";
+            gradePoint = 6;
+        }
+        else if (marks >= 40)
+        {
+            grade = "D";
+            gradePoint = 5;
+        }
+        else
+        {
+            grade = "F";
+            gradePoint = 0;
+        }
+    }
+};
+
+// Student Class
+class Student
+{
+private:
+    string name;
+    string rollNumber;
+    string course;
+    int semester;
+
+    vector<Subject> subjects;
+
+public:
+
+    // Student Registration
+    void registerStudent()
+    {
+        cout << "\n========== STUDENT REGISTRATION ==========\n";
+
+        cout << "Enter Student Name: ";
+        cin.ignore();
+        getline(cin, name);
+
+        cout << "Enter Roll Number: ";
+        getline(cin, rollNumber);
+
+        cout << "Enter Course: ";
+        getline(cin, course);
+
+        cout << "Enter Semester: ";
+        cin >> semester;
+
+        cout << "\nStudent Registered Successfully!\n";
+    }
+
+    // Add Subjects
+    void addSubjects()
+    {
+        int n;
+
+        cout << "\nEnter Number of Subjects: ";
+        cin >> n;
+
+        for (int i = 0; i < n; i++)
+        {
+            Subject s;
+
+            cout << "\n---------- Subject " << i + 1 << " ----------\n";
+
+            s.inputSubject();
+
+            if (s.marks < 0 || s.marks > 100 || s.credits <= 0)
+            {
+                cout << "Invalid marks or credits. Please enter again.\n";
+                i--;
+                continue;
+            }
+
+            subjects.push_back(s);
+        }
+
+        cout << "\nSubjects Added Successfully!\n";
+    }
+
+    // Calculate SGPA
+    float calculateSGPA()
+    {
+        float totalGradePoints = 0;
+        int totalCredits = 0;
+
+        for (auto s : subjects)
+        {
+            totalGradePoints += s.gradePoint * s.credits;
+            totalCredits += s.credits;
+        }
+
+        if (totalCredits == 0)
+            return 0;
+
+        return totalGradePoints / totalCredits;
+    }
+
+    // Calculate Percentage
+    float calculatePercentage()
+    {
+        if (subjects.empty())
+            return 0;
+
+        float totalMarks = 0;
+
+        for (auto s : subjects)
+        {
+            totalMarks += s.marks;
+        }
+
+        return totalMarks / subjects.size();
+    }
+
+    // Display Student Profile
+    void displayProfile()
+    {
+        cout << "\n========== STUDENT PROFILE ==========\n";
+
+        cout << "Name       : " << name << endl;
+        cout << "Roll Number: " << rollNumber << endl;
+        cout << "Course     : " << course << endl;
+        cout << "Semester   : " << semester << endl;
+    }
+
+    // Display Academic Report
+    void displayReport()
+    {
+        if (subjects.empty())
+        {
+            cout << "\nNo subject records found!\n";
+            return;
+        }
+
+        cout << "\n========== ACADEMIC REPORT ==========\n";
+
+        cout << left
+             << setw(20) << "Subject"
+             << setw(10) << "Marks"
+             << setw(10) << "Credits"
+             << setw(10) << "Grade"
+             << setw(12) << "Grade Point"
+             << endl;
+
+        cout << string(62, '-') << endl;
+
+        for (auto s : subjects)
+        {
+            cout << left
+                 << setw(20) << s.subjectName
+                 << setw(10) << s.marks
+                 << setw(10) << s.credits
+                 << setw(10) << s.grade
+                 << setw(12) << s.gradePoint
+                 << endl;
+        }
+
+        cout << string(62, '-') << endl;
+
+        float sgpa = calculateSGPA();
+        float percentage = calculatePercentage();
+
+        cout << fixed << setprecision(2);
+
+        cout << "\nSGPA       : " << sgpa << endl;
+        cout << "Percentage : " << percentage << "%" << endl;
+
+        cout << "\nPerformance: ";
+
+        if (sgpa >= 9)
+            cout << "Outstanding";
+        else if (sgpa >= 8)
+            cout << "Excellent";
+        else if (sgpa >= 7)
+            cout << "Very Good";
+        else if (sgpa >= 6)
+            cout << "Good";
+        else if (sgpa >= 5)
+            cout << "Average";
+        else
+            cout << "Needs Improvement";
+
+        cout << endl;
+    }
+
+    // Display Menu
+    void menu()
+    {
+        int choice;
+
+        do
+        {
+            cout << "\n====================================\n";
+            cout << "       STUDENT CGPA MANAGEMENT\n";
+            cout << "====================================\n";
+
+            cout << "1. Register Student\n";
+            cout << "2. Add Subjects\n";
+            cout << "3. View Student Profile\n";
+            cout << "4. Calculate SGPA\n";
+            cout << "5. View Academic Report\n";
+            cout << "6. Exit\n";
+
+            cout << "\nEnter Your Choice: ";
+            cin >> choice;
+
+            switch (choice)
+            {
+                case 1:
+                    registerStudent();
+                    break;
+
+                case 2:
+                    addSubjects();
+                    break;
+
+                case 3:
+                    displayProfile();
+                    break;
+
+                case 4:
+                    cout << fixed << setprecision(2);
+                    cout << "\nYour SGPA is: "
+                         << calculateSGPA() << endl;
+                    break;
+
+                case 5:
+                    displayReport();
+                    break;
+
+                case 6:
+                    cout << "\nThank You For Using CGPA Calculator!\n";
+                    break;
+
+                default:
+                    cout << "\nInvalid Choice! Try Again.\n";
+            }
+
+        } while (choice != 6);
+    }
+};
+int main()
+{
+    Student student;
+
+    cout << "====================================\n";
+    cout << "     CGPA CALCULATOR SYSTEM\n";
+    cout << "====================================\n";
+
+    student.menu();
+
+    return 0;
+}
