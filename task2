@@ -1,0 +1,162 @@
+#include <iostream>
+using namespace std;
+
+#define N 9
+
+// Function to print Sudoku board
+void printBoard(int board[N][N])
+{
+    cout << "\n========== SOLVED SUDOKU ==========\n";
+
+    for (int row = 0; row < N; row++)
+    {
+        if (row % 3 == 0 && row != 0)
+            cout << "---------------------\n";
+
+        for (int col = 0; col < N; col++)
+        {
+            if (col % 3 == 0 && col != 0)
+                cout << "| ";
+
+            cout << board[row][col] << " ";
+        }
+
+        cout << endl;
+    }
+}
+
+// Check whether number exists in row
+bool isInRow(int board[N][N], int row, int num)
+{
+    for (int col = 0; col < N; col++)
+    {
+        if (board[row][col] == num)
+            return true;
+    }
+
+    return false;
+}
+
+// Check whether number exists in column
+bool isInCol(int board[N][N], int col, int num)
+{
+    for (int row = 0; row < N; row++)
+    {
+        if (board[row][col] == num)
+            return true;
+    }
+
+    return false;
+}
+
+// Check 3x3 box
+bool isInBox(int board[N][N], int startRow,
+             int startCol, int num)
+{
+    for (int row = 0; row < 3; row++)
+    {
+        for (int col = 0; col < 3; col++)
+        {
+            if (board[startRow + row][startCol + col] == num)
+                return true;
+        }
+    }
+
+    return false;
+}
+
+// Check if placing number is valid
+bool isSafe(int board[N][N], int row,
+            int col, int num)
+{
+    return !isInRow(board, row, num) &&
+           !isInCol(board, col, num) &&
+           !isInBox(board, row - row % 3,
+                    col - col % 3, num);
+}
+
+// Backtracking Sudoku Solver
+bool solveSudoku(int board[N][N])
+{
+    int row, col;
+    bool emptyFound = false;
+
+    // Find empty cell
+    for (row = 0; row < N; row++)
+    {
+        for (col = 0; col < N; col++)
+        {
+            if (board[row][col] == 0)
+            {
+                emptyFound = true;
+                break;
+            }
+        }
+
+        if (emptyFound)
+            break;
+    }
+
+    // No empty cell means puzzle is solved
+    if (!emptyFound)
+        return true;
+
+    // Try numbers from 1 to 9
+    for (int num = 1; num <= 9; num++)
+    {
+        if (isSafe(board, row, col, num))
+        {
+            board[row][col] = num;
+
+            // Recursive call
+            if (solveSudoku(board))
+                return true;
+
+            // Backtrack
+            board[row][col] = 0;
+        }
+    }
+
+    return false;
+}
+
+// Main Function
+int main()
+{
+    int board[N][N];
+
+    cout << "================================\n";
+    cout << "       SUDOKU SOLVER\n";
+    cout << "================================\n";
+
+    cout << "\nEnter Sudoku Puzzle (Use 0 for empty cells):\n";
+
+    for (int row = 0; row < N; row++)
+    {
+        for (int col = 0; col < N; col++)
+        {
+            cin >> board[row][col];
+
+            if (board[row][col] < 0 || board[row][col] > 9)
+            {
+                cout << "Invalid input! Enter numbers from 0 to 9.\n";
+                return 1;
+            }
+        }
+    }
+
+    cout << "\nOriginal Sudoku:\n";
+    printBoard(board);
+
+    if (solveSudoku(board))
+    {
+        cout << "\nSudoku Solved Successfully!\n";
+        printBoard(board);
+    }
+    else
+    {
+        cout << "\nNo Solution Exists for this Sudoku!\n";
+    }
+
+    return 0;
+}
